@@ -59,37 +59,83 @@ echo "
 "
 }
 
+
 bauermedia() {
-if [ "$2" == "--save" ]; then
-        if [ "$4" == "--no-verbose" ]; then
-                 ffmpeg -loglevel quiet -hide_banner -i "https://bauermedia.pt/radiostream.aspx?radio=$1&type=MP3" -f mp3 pipe:1 | tee "$3".mp3| ffplay -nodisp -autoexit -loglevel quiet -
-                 exit
-        else
-                ffmpeg -i "https://bauermedia.pt/radiostream.aspx?radio=$1&type=MP3" -f mp3 pipe:1 | tee "$3".mp3 | ffplay -
-                exit
+        # $1 = NO_VERBOSE
+        # #2 = SAVE
+        # $3 = FILE_MP3
+        # $4 = Bauermedia radio ID
+        PLAY_AUDIO_QUIET=" "
+        FETCH_URL_QUIET=" "
+        FETCH_NOQUIET_URL=" "
+        SAVE_MP3=" "
+        # No verbose
+        if [ "$1" == "true" ]; then                
+                PLAY_AUDIO_QUIET='| ffplay -nodisp -autoexit -loglevel quiet -' 
+                FETCH_URL_QUIET="
+                ffmpeg -loglevel \
+                        quiet -hide_banner \
+                        -i \"https://bauermedia.pt/radiostream.aspx?radio=$4&type=MP3\" \
+                        -f mp3 pipe:1"
         fi
-fi
+        # Save in a file:
+        if [ "$2" == "true" ]; then
+                 SAVE_MP3=" | tee \"$3\".mp3"
+        fi
+        if [ "$1" == "false" ]; then
+                FETCH_NOQUIET_URL="ffmpeg -i \"https://bauermedia.pt/radiostream.aspx?radio=$4&type=MP3\" -f mp3 pipe:1"
+                PLAY_AUDIO='| ffplay -'
+        fi
+        COMMAND=$(printf "%s %s %s %s %s" "$FETCH_NOQUIET_URL" "$FETCH_URL_QUIET" "$SAVE_MP3" "$PLAY_AUDIO_QUIET" "$PLAY_AUDIO" | sed "s/'//g")
+        eval "$COMMAND"
+}
 
+argument_manage() {
+# Set all variablles to false
+LOOP_NUM=0
+NO_VERBOSE="false"
+RADIO_ID="false"
+SAVE="false"
+FILE_MP3="false"
+FIND_FILE="false"
+# Saturated variables
+SAVE_SATU="false"
+NO_VERBOSE_SATU="false"
+RADIO_ID_SATU="false"
+for i in "$@"; do  
+        LOOP_NUM=$((LOOP_NUM+1))
+   case $i in 
+           --no-verbose) 
+                   if [ "$NO_VERBOSE_SATU" == "false" ]; then
+                   NO_VERBOSE="true"
+                   NO_VERBOSE_SATU="saturate"
+                   fi
+                   ;;
+           --save)
+                   if [ "$SAVE_SATU" == "false" ]; then
+                   SAVE="true"
+                   SAVE_SATU="saturate"
+                   FIND_FILE="true"
+                   fi
+                   ;;
+           *)
+                   if [ "$LOOP_NUM" == 1 ]; then
+                   if [ "$RADIO_ID_SATU" == "false" ]; then
+                        RADIO_ID=$i
+                        RADIO_ID_SATU="saturate"
+                   fi
+                elif [ "$FIND_FILE" == "true" ]; then
+                       FILE_MP3=$i                         
+                       FIND_FILE="saturate"
+                   fi
 
-if [ "$2" == "--no-verbose" ]; then
-        if [ "$3" == "--save" ]; then
-                ffmpeg -loglevel quiet -hide_banner -i "https://bauermedia.pt/radiostream.aspx?radio=$1&type=MP3" -f mp3 pipe:1  | tee "$4".mp3 | ffplay -nodisp -autoexit -loglevel quiet -
-                exit
-        fi
-        mpv --force-seekable=yes "https://bauermedia.pt/radiostream.aspx?radio=$1&type=MP3" &>/dev/null      
-        exit
-else 
-        if [ "$2" == "--save" ]; then 
-                ffmpeg -i "https://bauermedia.pt/radiostream.aspx?radio=$1&type=MP3" -f mp3 pipe:1 | tee "$3".mp3 | ffplay -
-                exit
-        fi
-        mpv --force-seekable=yes "https://bauermedia.pt/radiostream.aspx?radio=$1&type=MP3"
-        exit
-fi
+   esac
+done
+        bauermedia "$NO_VERBOSE" "$SAVE" "$FILE_MP3" "$RADIO_ID"
 }
 
 get_version() {
-        echo "radiopt version 0.1.0"
+        echo "radiopt version 0.1.1"
 }
 
 select_radio() {
@@ -97,49 +143,49 @@ case "$1" in
         "-h"|"--help") get_help ;;
         "-v"|"--version") get_version ;;
         # M80
-        "m80") echo "Playing M80"  && bauermedia 30 "$2" "$3" "$4" ;;
-        "m80-rock") echo "Playing M80 Rock"  && bauermedia 43 "$2" "$3" "$4" ;;
-        "m80-80s") echo "Playing M80 80s" && bauermedia 35 "$2" "$3" "$4" ;;
-        "m80-70s") echo "Playing M80 70s" && bauermedia 34 "$2" "$3" "$4" ;;
-        "m80-90s") echo "Playing M80 90s" && bauermedia 36 "$2" "$3" "$4" ;;
-        "m80-ball") echo "Playing M80 Ballads" && bauermedia 47 "$2" "$3" "$4" ;;
-        "m80-pop") echo "Playing M80 Pop" && bauermedia 41 "$2" "$3" "$4" ;;
-        "m80-dance") echo "Playing M80 Dance" && bauermedia 40 "$2" "$3" "$4" ;;
-        "m80-indie") echo "Playing M80 Indie" && bauermedia 39 "$2" "$3" "$4" ;;
-        "m80-port") echo "Playing M80 Portugal" && bauermedia 42 "$2" "$3" "$4" ;;
-        "m80-bras") echo "Playing M80 Brasil" && bauermedia 80 "$2" "$3" "$4" ;;
-        "m80-disco") echo "Playing M80 Disco" && bauermedia 75 "$2" "$3" "$4" ;;
-        "m80-soul") echo "Playing M80 Soul" && bauermedia 44 "$2" "$3" "$4" ;;
-        "m80-60s") echo "Playing M80 60s" && bauermedia 33 "$2" "$3" "$4" ;;
+        "m80") echo "Playing M80"  && argument_manage 30 "$@" ;;
+        "m80-rock") echo "Playing M80 Rock"  && argument_manage 43 "$@" ;;
+        "m80-80s") echo "Playing M80 80s" && argument_manage 35 "$@" ;;
+        "m80-70s") echo "Playing M80 70s" && argument_manage 34 "$@" ;;
+        "m80-90s") echo "Playing M80 90s" && argument_manage 36 "$@" ;;
+        "m80-ball") echo "Playing M80 Ballads" && argument_manage 47 "$@" ;;
+        "m80-pop") echo "Playing M80 Pop" && argument_manage 41 "$@" ;;
+        "m80-dance") echo "Playing M80 Dance" && argument_manage 40 "$@" ;;
+        "m80-indie") echo "Playing M80 Indie" && argument_manage 39 "$@" ;;
+        "m80-port") echo "Playing M80 Portugal" && argument_manage 42 "$@" ;;
+        "m80-bras") echo "Playing M80 Brasil" && argument_manage 80 "$@" ;;
+        "m80-disco") echo "Playing M80 Disco" && argument_manage 75 "$@" ;;
+        "m80-soul") echo "Playing M80 Soul" && argument_manage 44 "$@" ;;
+        "m80-60s") echo "Playing M80 60s" && argument_manage 33 "$@" ;;
         # Cidade "$2" "$3" "$4" FM
-        "cidade_fm") echo "Playing CidadeFM" && bauermedia 15 "$2" "$3" "$4" ;;
-        "cidade_hiphop") echo "Playing Cidade_hip_hop" && bauermedia 59 "$2" "$3" "$4" ;;
-        "cidade_latina") echo "Playing Cidade_latina" && bauermedia 78 "$2" "$3" "$4" ;;
+        "cidade_fm") echo "Playing CidadeFM" && argument_manage 15 "$@" ;;
+        "cidade_hiphop") echo "Playing Cidade_hip_hop" && argument_manage 59 "$@" ;;
+        "cidade_latina") echo "Playing Cidade_latina" && argument_manage 78 "$@" ;;
         # Smooth"$2" "$3" "$4" FM
-        "smoothfm") echo "Playing SmoothFM" && bauermedia 32 "$2" "$3" "$4" ;;
-        "smoothfm-vjazz") echo "Playing SmoothFM Vocal Jazz" && bauermedia 63 "$2" "$3" "$4" ;;
-        "smoothfm-soul") echo "Playing SmoothFM Soul" && bauermedia 56 "$2" "$3" "$4" ;;
-        "smoothfm-blues") echo "Playing SmoothFM Blues" && bauermedia 37 "$2" "$3" "$4" ;;
-        "smoothfm-bosno") echo "Playing SmoothFM Bossa Nova" && bauermedia 38 "$2" "$3" "$4" ;;
-        "smoothfm-jazz") echo "Playing SmoothFM Jazz" && bauermedia 67 "$2" "$3" "$4" ;;
-        "smoothfm-cool") echo "Playing SmoothFM Cool" && bauermedia 72 "$2" "$3" "$4" ;;
+        "smoothfm") echo "Playing SmoothFM" && argument_manage 32 "$@" ;;
+        "smoothfm-vjazz") echo "Playing SmoothFM Vocal Jazz" && argument_manage 63 "$@" ;;
+        "smoothfm-soul") echo "Playing SmoothFM Soul" && argument_manage 56 "$@" ;;
+        "smoothfm-blues") echo "Playing SmoothFM Blues" && argument_manage 37 "$@" ;;
+        "smoothfm-bosno") echo "Playing SmoothFM Bossa Nova" && argument_manage 38 "$@" ;;
+        "smoothfm-jazz") echo "Playing SmoothFM Jazz" && argument_manage 67 "$@" ;;
+        "smoothfm-cool") echo "Playing SmoothFM Cool" && argument_manage 72 "$@" ;;
         # RadioComerci"$2" "$3" "$4" al
-        "radiocomercial") echo "Playing Radio Comercial" && bauermedia 11 "$2" "$3" "$4" ;;
-        "radiocomercial-rock") echo "Playing Radio Comercial Rock" && bauermedia 55 "$2" "$3" "$4" ;;
-        "radiocomercial-dance") echo "Playing Radio Comercial Dance" && bauermedia 53 "$2" "$3" "$4" ;;
-        "radiocomercial-bynight") echo "Playing Radio Comercial By Night" && bauermedia 65 "$2" "$3" "$4" ;;
-        "radiocomercial-kids") echo "Playing Radio Comercial Kids" && bauermedia 76 "$2" "$3" "$4" ;;
-        "radiocomercial-port") echo "Playing Radio Comercial Portugal" && bauermedia 64 "$2" "$3" "$4" ;;
-        "radiocomercial-bras") echo "Playing Radio Comercial Brasil" && bauermedia 73 "$2" "$3" "$4" ;;
-        "radiocomercial-90s") echo "Playing Radio Comercial 90s" && bauermedia 69 "$2" "$3" "$4" ;;
-        "radiocomercial-2ks") echo "Playing Radio Comercial 2000s" && bauermedia 68 "$2" "$3" "$4" ;;
-        "radiocomercial-sanpop") echo "Playing Radio Comercial Santos Populares" && bauermedia 79 "$2" "$3" "$4" ;;
+        "radiocomercial") echo "Playing Radio Comercial" && argument_manage 11 "$@" ;;
+        "radiocomercial-rock") echo "Playing Radio Comercial Rock" && argument_manage 55 "$@" ;;
+        "radiocomercial-dance") echo "Playing Radio Comercial Dance" && argument_manage 53 "$@" ;;
+        "radiocomercial-bynight") echo "Playing Radio Comercial By Night" && argument_manage 65 "$@" ;;
+        "radiocomercial-kids") echo "Playing Radio Comercial Kids" && argument_manage 76 "$@" ;;
+        "radiocomercial-port") echo "Playing Radio Comercial Portugal" && argument_manage 64 "$@" ;;
+        "radiocomercial-bras") echo "Playing Radio Comercial Brasil" && argument_manage 73 "$@" ;;
+        "radiocomercial-90s") echo "Playing Radio Comercial 90s" && argument_manage 69 "$@" ;;
+        "radiocomercial-2ks") echo "Playing Radio Comercial 2000s" && argument_manage 68 "$@" ;;
+        "radiocomercial-sanpop") echo "Playing Radio Comercial Santos Populares" && argument_manage 79 "$@" ;;
 
 
 
-        "batida") echo "Playing Batida" && bauermedia 82 "$2" ;;
+        "batida") echo "Playing Batida" && argument_manage 82 "$2" ;;
         *) echo "Option not found: $1" 
 esac
 }
 
-select_radio "$1" "$2" "$3" "$4"
+select_radio "$@"

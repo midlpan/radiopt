@@ -1,5 +1,5 @@
 # Radiopt
-radiopt is a CLI program to listen to Portuguese radio through the terminal (you can also save the audio in a .mp3 file)
+radiopt is a CLI program to listen to Portuguese web radios through the terminal (you can also save the audio in a .mp3 file)
 
 ## Supported radios
 
@@ -15,7 +15,6 @@ radiopt is a CLI program to listen to Portuguese radio through the terminal (you
 ## Install
 Dependencies:
 
-* mpv
 * ffmpeg
 
 ## Scrip Install

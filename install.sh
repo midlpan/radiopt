@@ -6,7 +6,6 @@ install_radiopt() {
         echo ""
         echo "radiopt dependencies:"
         echo ""
-        echo "mpv"
         echo "ffmpeg"
         echo ""
         echo "radiopt info:"
