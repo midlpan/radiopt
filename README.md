@@ -10,7 +10,7 @@ radiopt is a CLI program to listen to Portuguese web radios through the terminal
 * batida
 
 ## Supported in
- Linux
+Linux
 
 ## Install
 Dependencies:
