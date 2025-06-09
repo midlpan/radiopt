@@ -37,6 +37,12 @@ echo "
                 cidade_fm
                 cidade_hiphop
                 cidade_latina
+                rfm
+                rfm-80s
+                rfm-dance
+                rfm-rock
+                rfm-pacific (Oceano Pacifico)
+                renascenca
                 smoothfm
                 smoothfm-vjazz (Vocal Jazz)
                 smoothfm-soul
@@ -69,13 +75,22 @@ bauermedia() {
         FETCH_URL_QUIET=" "
         FETCH_NOQUIET_URL=" "
         SAVE_MP3=" "
+        # Special URLs (no bauermedia)
+        case $4 in 
+                "rfm") URL="https://playerservices.streamtheworld.com/api/livestream-redirect/RFMAAC.aac" ;;
+                "rfm-rock") URL="https://playerservices.streamtheworld.com/api/livestream-redirect/RFMONTHEROCKAAC.aac" ;;
+                "rfm-pacific") URL="https://playerservices.streamtheworld.com/api/livestream-redirect/OCEANPACIFICAAC.aac" ;;
+                "rfm-80s") URL="https://22533.live.streamtheworld.com/GR80SRFMAAC" ;;
+                "renascenca") URL="https://25643.live.streamtheworld.com/RADIO_RENASCENCAAAC" ;;
+                *) URL="\"https://bauermedia.pt/radiostream.aspx?radio=$4&type=MP3\" "
+        esac
         # No verbose
         if [ "$1" == "true" ]; then                
                 PLAY_AUDIO_QUIET='| ffplay -nodisp -autoexit -loglevel quiet -' 
                 FETCH_URL_QUIET="
                 ffmpeg -loglevel \
                         quiet -hide_banner \
-                        -i \"https://bauermedia.pt/radiostream.aspx?radio=$4&type=MP3\" \
+                        -i $URL \
                         -f mp3 pipe:1"
         fi
         # Save in a file:
@@ -83,7 +98,7 @@ bauermedia() {
                  SAVE_MP3=" | tee \"$3\".mp3"
         fi
         if [ "$1" == "false" ]; then
-                FETCH_NOQUIET_URL="ffmpeg -i \"https://bauermedia.pt/radiostream.aspx?radio=$4&type=MP3\" -f mp3 pipe:1"
+                FETCH_NOQUIET_URL="ffmpeg -i $URL -f mp3 pipe:1"
                 PLAY_AUDIO='| ffplay -'
         fi
         COMMAND=$(printf "%s %s %s %s %s" "$FETCH_NOQUIET_URL" "$FETCH_URL_QUIET" "$SAVE_MP3" "$PLAY_AUDIO_QUIET" "$PLAY_AUDIO" | sed "s/'//g")
@@ -135,7 +150,7 @@ done
 }
 
 get_version() {
-        echo "radiopt version 0.1.1"
+        echo "radiopt version 1.1.2"
 }
 
 select_radio() {
@@ -157,6 +172,14 @@ case "$1" in
         "m80-disco") echo "Playing M80 Disco" && argument_manage 75 "$@" ;;
         "m80-soul") echo "Playing M80 Soul" && argument_manage 44 "$@" ;;
         "m80-60s") echo "Playing M80 60s" && argument_manage 33 "$@" ;;
+        # RFM
+        "rfm") echo "Playing RFM" && argument_manage "rfm" "$@" ;;
+        "rfm-rock") echo "Playing RFM Rock" && argument_manage "rfm-rock" "$@" ;;
+        "rfm-dance") echo "Playing RFM Dance On The Floor" && argument_manage "rfm-dance" "$@" ;;
+        "rfm-80s") echo "Playing RFM 80s" && argument_manage "rfm-80s" "$@" ;;
+        "rfm-pacific") echo "Playing RFM Oceno Pacifico" && argument_manage "rfm-pacific" "$@" ;;
+        # Renascenca
+        "renascenca") echo "Playing Radio Renascenca" && argument_manage "renascenca" "$@" ;;
         # Cidade "$2" "$3" "$4" FM
         "cidade_fm") echo "Playing CidadeFM" && argument_manage 15 "$@" ;;
         "cidade_hiphop") echo "Playing Cidade_hip_hop" && argument_manage 59 "$@" ;;

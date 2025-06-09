@@ -13,7 +13,7 @@ install_radiopt() {
         echo "License: GPLv3"
         echo "Creator: midlpan (https://github.com/midlpan)"
         echo "Source:  https://github.com/midlpan/radiopt"
-        echo "Version: 0.1.0"
+        echo "Version: 0.1.2"
 
         read -rp "Continue with the installation[y/n]: " input 
 
