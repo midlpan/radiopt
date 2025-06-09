@@ -150,7 +150,7 @@ done
 }
 
 get_version() {
-        echo "radiopt version 1.1.2"
+        echo "radiopt version 0.1.2"
 }
 
 select_radio() {
