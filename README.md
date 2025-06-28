@@ -19,7 +19,7 @@ Dependencies:
 
 * ffmpeg
 
-## Scrip Install
+## Script Install
 Run the script install.sh
 
 ```bash
