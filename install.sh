@@ -20,6 +20,7 @@ install_radiopt() {
         if [ "$input" == "y" ]; then
                 echo "Moving $PWD/radiopt.sh to /usr/bin/radiopt"
                 sudo mv "$PWD"/radiopt.sh /usr/bin/radiopt
+                chmod -w /usr/bin/radiopt.sh
                 echo "Installation completed successfully"
         else
                 echo "Exiting..."
