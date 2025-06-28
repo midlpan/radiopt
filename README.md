@@ -31,7 +31,7 @@ chmod +x install.sh
 Move the radiopt.sh to /usr/bin/radiopt
 
 ```bash
-chmod +x radiopt.sh
+chmod -w+x radiopt.sh
 sudo mv radiopt.sh /usr/bin/radiopt
 ```
 
