@@ -9,7 +9,7 @@ radiopt is a CLI program to listen to Portuguese web radios through the terminal
 * SmoothFM
 * batida
 * RFM
-* Renascenca
+* Renascença
 
 ## Supported in
 Linux
