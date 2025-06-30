@@ -1,4 +1,6 @@
 #!/usr/bin/bash
+source /usr/share/radiopt/logos.sh
+
 
 get_help() {
 echo "
@@ -11,12 +13,12 @@ echo "
         Options:
                 -h|--help ) Mostra esta mensagem
                 -v|--version) Mostra a versão do programa
-                --no-verbose) Não mostra o output do MPV
+                --verbose) Mostra a saída ffmpeg e aceita teclas de atalho.
                 --save) Salva o audio num arquivo.mp3 expecificado pelo usuário
         (English)
                 -h|--help) Show this message
                 -v|--version) Show the program version
-                --no-verbose) Don't show MPV output
+                --verbose) Show ffmpeg output and accepts keybinds
                 --save) Saves audio to a user-specified .mp3 file
 
         Radios:
@@ -66,6 +68,158 @@ echo "
 }
 
 
+categories() {
+        # $1 = Radio Name
+        # $2 Command Line arguments
+# arrays:
+        categories_radiocomercial=(
+                "radiocomercial"
+                "radiocomercial-rock"
+                "radiocomercial-dance"
+                "radiocomercial-bynight"
+                "radiocomercial-ohw"
+                "radiocomercial-kids"
+                "radiocomercial-port"
+                "radiocomercial-bras"
+                "radiocomercial-90s"
+                "radiocomercial-2ks"
+                "radiocomercial-sanpop"
+        )
+
+        categories_m80=(
+                "m80"
+                "m80-60s"
+                "m80-70s"
+                "m80-80s"
+                "m80-90s"
+                "m80-rock"
+                "m80-ball"
+                "m80-pop"
+                "m80-dance"
+                "m80-indie"
+                "m80-port"
+                "m80-bras"
+                "m80-disco"
+                "m80-soul"
+        )
+        
+        categories_cidadefm=(
+                "cidade_fm"
+                "cidade_hiphop"
+                "cidade_latina" 
+        )
+
+        categories_rfm=(
+                "rfm"
+                "rfm-80s"
+                "rfm-dance"
+                "rfm-rock"
+                "rfm-pacific "
+        )        
+
+        categories_smoothfm=(
+                "smoothfm"
+                "smoothfm-vjazz"
+                "smoothfm-soul"
+                "smoothfm-blues"
+                "smoothfm-bosno"
+                "smoothfm-jazz"
+                "smoothfm-cool"
+        )
+        
+        case $1 in 
+                        "radiocomercial")
+                                        echo -e "$comercial_logo"
+                                        for n in $(seq 0 10); do
+                                                echo "[$n] ${categories_radiocomercial[$n]}"
+                                        done
+                                        read -rp 'select: ' radio_selected
+                                        select_radio "${categories_radiocomercial[$radio_selected]}" "$@"
+                                        ;;
+
+                        "m80")
+                                        echo -e "$m80_logo"
+                                        for n in $(seq 0 13); do
+                                                echo "[$n] ${categories_m80[$n]}"
+                                        done
+                                        read -rp 'select: ' radio_selected
+                                        select_radio "${categories_m80[$radio_selected]}" "$@"
+                                        ;;
+                        "cidadefm")
+                                        echo -e "$cidadefm_logo"
+                                        for n in $(seq 0 2); do
+                                                echo "[$n] ${categories_cidadefm[$n]}"
+                                        done
+                                        read -rp 'select: ' radio_selected
+                                        select_radio "${categories_cidadefm[$radio_selected]}" "$@"
+                                        ;;
+                        "rfm")
+                                        echo -e "$rfm_logo"
+                                        for n in $(seq 0 0); do
+                                                echo "[$n] ${categories_rfm[$n]}"
+                                        done
+                                        read -rp 'select: ' radio_selected
+                                        select_radio "${categories_rfm[$radio_selected]}" "$@"
+                                        ;;
+
+                        "smoothfm")
+                                        echo -e "$smoothfm_logo"
+                                        for n in $(seq 0 6); do
+                                                echo "[$n] ${categories_smoothfm[$n]}"
+                                        done
+                                        read -rp 'select: ' radio_selected
+                                        select_radio "${categories_smoothfm[$radio_selected]}" "$@"
+                                        ;;
+
+                        "batida")
+                                        echo -e "$batida_logo"
+                                        select_radio "batida" "$@"
+                                        ;;
+
+
+                        "renascenca") 
+                                        echo -e "$renascenca_logo"
+                                        select_radio "renascenca" "$@"
+                                        ;;
+
+
+
+                        *) echo "ERROR: In categories function."; exit 1
+        esac
+
+}
+
+
+cli_interface() {
+        echo -e "\e[31m ____           _ _             _   "
+        echo -e "\e[31m|  _ \\ __ _  __| (_) ___  _ __ | |_ "
+        echo -e "\e[31m| |_) / _\` |/ _\` | |/ _ \\| '_ \\| __| "
+        echo -e "\e[31m|  _ < (_| | (_| | | (_) | |_) | |_ "
+        echo -e "\e[31m|_| \\_\\__,_|\\__,_|_|\\___/| .__/ \\__| "
+        echo -e "\e[31m                         |_|    \e[0m"
+        echo -e "Select a option:"
+        echo "[1] Radio Comercial"
+        echo "[2] M80"
+        echo "[3] cidade_fm"
+        echo "[4] SmoothFM"
+        echo "[5] batida"
+        echo "[6] RFM"
+        echo "[7] Renascença"
+        read -rp "[0..7]:" radio
+
+        case $radio in
+                "1") categories "radiocomercial" "$@";;
+                "2") categories "m80" "$@";;
+                "3") categories "cidadefm" "$@" ;;
+                "4") categories "smoothfm" "$@" ;;
+                "5") categories "batida" "$@" ;;
+                "6") categories "rfm" "$@" ;;
+                "7") categories "renascenca" "$@" ;;
+                *) echo "ERROR: Option $radio not found" && exit 1
+        esac
+
+}
+
 bauermedia() {
         # $1 = NO_VERBOSE
         # #2 = SAVE
@@ -105,10 +259,13 @@ bauermedia() {
         eval "$COMMAND"
 }
 
+
+
+
 argument_manage() {
 # Set all variablles to false
 LOOP_NUM=0
-NO_VERBOSE="false"
+NO_VERBOSE="true"
 RADIO_ID="false"
 SAVE="false"
 FILE_MP3="false"
@@ -120,9 +277,9 @@ RADIO_ID_SATU="false"
 for i in "$@"; do  
         LOOP_NUM=$((LOOP_NUM+1))
    case $i in 
-           --no-verbose) 
+           --verbose) 
                    if [ "$NO_VERBOSE_SATU" == "false" ]; then
-                   NO_VERBOSE="true"
+                   NO_VERBOSE="false"
                    NO_VERBOSE_SATU="saturate"
                    fi
                    ;;
@@ -150,8 +307,10 @@ done
 }
 
 get_version() {
-        echo "radiopt version 0.1.2"
+        echo "radiopt version 0.1.3"
 }
+
+
 
 select_radio() {
 case "$1" in
@@ -207,8 +366,8 @@ case "$1" in
 
 
         "batida") echo "Playing Batida" && argument_manage 82 "$2" ;;
-        *) echo "Option not found: $1" 
+        *) cli_interface "$@" ;;
+        #*) echo -e "Option/Radio not found: $1 \e[33m(If this is the case please put the radio name first)" && exit 1
 esac
 }
-
 select_radio "$@"

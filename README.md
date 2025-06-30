@@ -1,4 +1,6 @@
-# Radiopt
+<div align="center">
+![Radiopt](https://raw.githubusercontent.com/midlpan/radiopt/refs/heads/main/.github/radiopt.png)
+</div>
 radiopt is a CLI program to listen to Portuguese web radios through the terminal (you can also save the audio in a .mp3 file)
 
 ## Supported radios
@@ -31,16 +33,24 @@ chmod +x install.sh
 Move the radiopt.sh to /usr/bin/radiopt
 
 ```bash
-chmod -w+x radiopt.sh
+chmod -w+x radiopt.sh logos.sh
 sudo mv radiopt.sh /usr/bin/radiopt
+sudo mkdir /usr/share/radiopt
+sudo mv logos.sh /usr/share/radiopt/
 ```
 
 ## How use
-To use it, you always need some argument
+To use you can
 ```bash
 radiopt --help
 ```
+For a help message
+```bash
+radiopt
+```
+For CLI interface mode
 Usage:
 ```bash
 radiopt [OPTION/RADIO]
 ```
+For normal mode
