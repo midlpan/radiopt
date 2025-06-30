@@ -1,6 +1,7 @@
-<div align="center">
-![Radiopt](./.github/radiopt.png)
-</div>
+<p align="center">
+  <img src=".github/radiopt.png" alt="Logo do radiopt">
+</p>
+
 radiopt is a CLI program to listen to Portuguese web radios through the terminal (you can also save the audio in a .mp3 file)
 
 ## Supported radios
