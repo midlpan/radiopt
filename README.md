@@ -1,5 +1,5 @@
 <div align="center">
-![Radiopt](https://github.com/midlpan/radiopt/blob/main/.github/radiopt.png?raw=true)
+![Radiopt](./.github/radiopt.png)
 </div>
 radiopt is a CLI program to listen to Portuguese web radios through the terminal (you can also save the audio in a .mp3 file)
 
